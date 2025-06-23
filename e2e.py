@@ -1,15 +1,14 @@
 import time
 import platform
-import os
+from selenium.webdriver.support.ui import Select
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.firefox.service import Service as FirefoxService
+
+from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.firefox import GeckoDriverManager
 
 def config_selenium():
-    from selenium import webdriver
-    from selenium.webdriver.chrome.service import Service
-    from selenium.webdriver.firefox.service import Service as FirefoxService
-
-    from webdriver_manager.chrome import ChromeDriverManager
-    from webdriver_manager.firefox import GeckoDriverManager
-
     try:
         chrome_options = webdriver.ChromeOptions()
         chrome_options.add_argument("--no-sandbox")
@@ -36,10 +35,10 @@ def config_selenium():
     return driver
 
 def criar_conta(driver):
+    print("testando a criação de contas")
     driver.get(f"http://localhost:3000/login")
 
     REGISTRAR_LINK = '/html/body/div/div[2]/form/div[3]/div/a'
-
     NOME_CLIENT_INPUT = '/html/body/form/div[1]/input[1]'
     SOBRENOME_CLIENT_INPUT = '/html/body/form/div[1]/input[2]'
     CPF_RESTANTE_INPUT = '/html/body/form/div[1]/input[3]'   
@@ -58,7 +57,7 @@ def criar_conta(driver):
     COMPLEMENTO_INPUT = '/html/body/form/div[2]/input[7]'
 
     driver.find_element("xpath", REGISTRAR_LINK).click()
-    
+    time.sleep(1)
     driver.find_element("xpath", NOME_CLIENT_INPUT).send_keys("Teste")
     driver.find_element("xpath", SOBRENOME_CLIENT_INPUT).send_keys("E2E")
     driver.find_element("xpath", CPF_RESTANTE_INPUT).send_keys("09168219008")
@@ -79,6 +78,8 @@ def criar_conta(driver):
     time.sleep(3)
 
 def login_cliente(driver):
+    print("testando o login do cliente")
+
     driver.get(f"http://localhost:3000/login")
     CLIENTE_BUTTON = '/html/body/div/div[2]/form/div[1]/label[2]'
     EMAIL_INPUT = '/html/body/div/div[2]/form/input[1]'
@@ -93,18 +94,36 @@ def login_cliente(driver):
     time.sleep(3)
 
 def menu_cliente(driver):
+    print("testando o menu do cliente")
+
     driver.get(f"http://localhost:3000/client")
-    
     TRANFERENCIA_BUTTON = '/html/body/div/div/div[4]/button[1]'
+    ISNSTITUICAO_SELECT = '/html/body/div[1]/div/div[4]/select[1]'   
+    AGENCIA_INPUT = '/html/body/div[1]/div/div[4]/div[1]/div[1]/input'
+    CPF_INPUT = '/html/body/div/div/div[4]/div[1]/div[2]/input'
+    PARA_OUTRA_PESSOA_BUTTON = '/html/body/div/div/div[4]/div[2]/label[2]'
+    VALOR_INPUT = '/html/body/div/div/div[4]/input'
+    VOLTAR_BUTTON = '/html/body/div/div/div[4]/div[3]/div/button[1]'
+    DEPOSITO_BUTTON = '/html/body/div/div/div[4]/button[2]'
+    VALOR_DEPOSITO_INPUT = '/html/body/div/div/div[4]/input'
+    VOLTAR_DEPOSITO_BUTTON = '/html/body/div/div/div[4]/div/div/button[1]'
+    
     driver.find_element("xpath", TRANFERENCIA_BUTTON).click()
-
+    time.sleep(1)
+    select_element = driver.find_element("xpath", ISNSTITUICAO_SELECT)
+    select = Select(select_element)
+    select.select_by_value("banco1") 
+    driver.find_element("xpath", AGENCIA_INPUT).send_keys("Teste")
+    driver.find_element("xpath", CPF_INPUT).send_keys("09312389030")   
+    driver.find_element("xpath", PARA_OUTRA_PESSOA_BUTTON).click()
+    driver.find_element("xpath", VALOR_INPUT).send_keys("100.00")   
+    driver.find_element("xpath", VOLTAR_BUTTON).click()
+    time.sleep(1)
+    driver.find_element("xpath", DEPOSITO_BUTTON).click()
+    time.sleep(1)
+    driver.find_element("xpath", VALOR_DEPOSITO_INPUT).send_keys("100.00")   
+    driver.find_element("xpath", VOLTAR_DEPOSITO_BUTTON).click()
     time.sleep(3)
-
-def login_funcionario(driver):
-    pass
-
-def menu_funcionario(driver):
-    pass
 
 def TestForm(driver):
     try:    
@@ -115,6 +134,7 @@ def TestForm(driver):
         driver.quit()
         print("error on TestForm:", e)
     finally:
+        print("Testes concluidos.")
         driver.quit()
 
 def e2e():
